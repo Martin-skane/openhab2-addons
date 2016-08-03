@@ -58,7 +58,7 @@ public class CameraHandler extends BaseThingHandler {
     public void initialize() {
         updateStatus(ThingStatus.INITIALIZING);
         logger.debug("Initialize thing: " + getThing().getLabel() + "::" + getThing().getUID());
-        Object param = getConfig().get("url_snapshot");
+        Object param = getConfig().get("urlSnapshot");
         urlSnapshot = String.valueOf(param);
         try {
             param = getConfig().get("poll");
@@ -87,21 +87,26 @@ public class CameraHandler extends BaseThingHandler {
                             logger.trace("Will update: " + cx.getChannelTypeUID().getId() + "::" + getThing().getLabel()
                                     + "::" + getThing().getUID().getId());
                         }
-                        try {
-                            final URL url = new URL(urlSnapshot);
-                            updateState(cx.getUID(), new RawType(readImage(url).toByteArray()));
-                            updateStatus(ThingStatus.ONLINE);
-                        } catch (MalformedURLException e) {
-                            logger.warn("could not update value: " + getThing(), e);
-                            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-                                    "snapshot url not valid: " + e.toString());
-                        } catch (IOException e) {
-                            logger.warn("could not update value: " + getThing(), e);
-                            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                                    "camera not reachable: " + e.toString());
-                        } catch (Exception e) {
-                            logger.warn("could not update value: " + getThing(), e);
-                            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE, "unknown error: " + e.toString());
+                        if (urlSnapshot != null) {
+                            try {
+                                final URL url = new URL(urlSnapshot);
+                                updateState(cx.getUID(), new RawType(readImage(url).toByteArray()));
+                                updateStatus(ThingStatus.ONLINE);
+                            } catch (MalformedURLException e) {
+                                logger.warn("could not update value: " + getThing(), e);
+                                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+                                        "snapshot url not valid: " + e.toString());
+                            } catch (IOException e) {
+                                logger.warn("could not update value: " + getThing(), e);
+                                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
+                                        "camera not reachable: " + e.toString());
+                            } catch (Exception e) {
+                                logger.warn("could not update value: " + getThing(), e);
+                                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE,
+                                        "unknown error: " + e.toString());
+                            }
+                        } else {
+                            updateStatus(ThingStatus.UNINITIALIZED, ThingStatusDetail.CONFIGURATION_PENDING);
                         }
                     }
                 }
