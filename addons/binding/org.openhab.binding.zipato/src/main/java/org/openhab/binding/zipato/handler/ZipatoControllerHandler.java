@@ -115,7 +115,7 @@ public class ZipatoControllerHandler extends BaseBridgeHandler {
             @Override
             public void run() {
                 try {
-                    sleep(1000);
+                    sleep(5000);
                     discoveryService = new ZipatoDeviceDiscoveryService(ZipatoControllerHandler.this);
                     bundleContext.registerService(DiscoveryService.class.getName(), discoveryService,
                             new Hashtable<String, Object>());
